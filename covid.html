@@ -1,67 +1,594 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Live Public Health Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Community Public Health Resource Hub</title>
+  <meta name="description" content="A simple public health resource hub with prevention tips, vaccination info, and local resource guidance." />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      padding: 30px;
+    :root{
+      --bg:#0b1220;
+      --card:#121b2e;
+      --muted:#a9b3c7;
+      --text:#e9eefc;
+      --accent:#5eead4;
+      --accent2:#93c5fd;
+      --danger:#fb7185;
+      --border:rgba(255,255,255,.08);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
     }
-    h1 {
-      color: #0f766e;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(94,234,212,.18), transparent 60%),
+                  radial-gradient(900px 500px at 100% 0%, rgba(147,197,253,.16), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      line-height:1.5;
     }
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 600px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    a{color:inherit}
+    .container{
+      max-width:1100px;
+      margin:0 auto;
+      padding:24px;
     }
-    .metric {
-      margin: 12px 0;
+    header{
+      position:sticky;
+      top:0;
+      z-index:10;
+      backdrop-filter: blur(10px);
+      background: rgba(11,18,32,.72);
+      border-bottom:1px solid var(--border);
+    }
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:14px 24px;
+      max-width:1100px;
+      margin:0 auto;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:700;
+      letter-spacing:.3px;
+    }
+    .logo{
+      width:36px;height:36px;border-radius:12px;
+      background: linear-gradient(135deg, rgba(94,234,212,.95), rgba(147,197,253,.95));
+      box-shadow: 0 8px 18px rgba(94,234,212,.18);
+    }
+    .nav a{
+      text-decoration:none;
+      font-weight:600;
+      color:var(--muted);
+    }
+    .navlinks{
+      display:flex; gap:14px; flex-wrap:wrap; justify-content:flex-end;
+    }
+    .cta{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      background: rgba(94,234,212,.12);
+      border:1px solid rgba(94,234,212,.25);
+      color:var(--text);
+      text-decoration:none;
+      font-weight:700;
+    }
+    .hero{
+      padding:40px 0 24px;
+      display:grid;
+      grid-template-columns: 1.3fr .9fr;
+      gap:18px;
+      align-items:stretch;
+    }
+    .card{
+      background: rgba(18,27,46,.72);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero .main{
+      padding:26px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero .main:before{
+      content:"";
+      position:absolute;
+      inset:-120px -120px auto auto;
+      width:280px;height:280px;border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(94,234,212,.25), transparent 65%);
+      filter: blur(2px);
+    }
+    h1{
+      font-size: clamp(28px, 3.4vw, 44px);
+      line-height:1.1;
+      margin:0 0 10px;
+      letter-spacing:-.02em;
+    }
+    .subtitle{
+      margin:0 0 18px;
+      color: var(--muted);
+      max-width: 60ch;
+    }
+    .pillrow{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin-top: 14px;
+    }
+    .pill{
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      color:var(--muted);
+      font-weight:600;
+      font-size:14px;
+      background: rgba(255,255,255,.02);
+    }
+    .side{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .alert{
+      border:1px solid rgba(251,113,133,.28);
+      background: rgba(251,113,133,.10);
+      padding:14px 14px;
+      border-radius: 14px;
+    }
+    .alert strong{color:#ffd5dc}
+    .small{color:var(--muted); font-size:14px}
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:16px;
+      margin: 18px 0 26px;
+    }
+    .span6{grid-column: span 6}
+    .span4{grid-column: span 4}
+    .span8{grid-column: span 8}
+    .span12{grid-column: span 12}
+    .section{
+      padding:18px;
+    }
+    .section h2{
+      margin:0 0 10px;
       font-size: 18px;
+      letter-spacing:-.01em;
     }
-    .label {
-      font-weight: bold;
-      color: #333;
+    .kpi{
+      display:flex; gap:12px; flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .kpi .box{
+      flex:1 1 160px;
+      padding:12px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.02);
+    }
+    .kpi .num{
+      font-size:18px;
+      font-weight:800;
+      margin-bottom:2px;
+    }
+    .kpi .lbl{color:var(--muted); font-size:13px}
+    .list{
+      display:flex; flex-direction:column; gap:10px;
+      margin-top:10px;
+    }
+    .item{
+      padding:12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .item a{
+      color: var(--accent2);
+      text-decoration:none;
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .item p{margin:0; color:var(--muted); font-size:14px}
+    .symptom-form{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+    label{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      font-weight:600;
+      color:var(--text);
+    }
+    input[type="checkbox"]{transform: scale(1.1)}
+    button{
+      cursor:pointer;
+      border-radius: 14px;
+      border:1px solid rgba(94,234,212,.35);
+      background: rgba(94,234,212,.14);
+      color: var(--text);
+      padding:11px 12px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    button:hover{background: rgba(94,234,212,.18)}
+    .result{
+      margin-top:10px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      color: var(--muted);
+      font-size:14px;
+    }
+    .result strong{color:var(--text)}
+    details{
+      border:1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,.02);
+      padding: 12px;
+    }
+    summary{
+      cursor:pointer;
+      font-weight:800;
+      color: var(--text);
+    }
+    details p{color:var(--muted); margin:10px 0 0}
+    footer{
+      margin-top:26px;
+      padding: 18px 0 28px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .footergrid{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .tag{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      margin-right:8px;
+      margin-top:8px;
+      color:var(--muted);
+      font-weight:600;
+    }
+    @media (max-width: 860px){
+      .hero{grid-template-columns:1fr}
+      .span6,.span4,.span8{grid-column:span 12}
+      .navlinks{justify-content:flex-start}
     }
   </style>
 </head>
-
 <body>
+  <header>
+    <nav class="nav" aria-label="Primary">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          Community Health Hub<br />
+          <span class="small">Prevention • Vaccination • Resources</span>
+        </div>
+      </div>
+      <div class="navlinks">
+        <a href="#resources">Resources</a>
+        <a href="#symptoms">Symptom Guide</a>
+        <a href="#clinic">Find Care</a>
+        <a class="cta" href="#emergency" title="Emergency guidance">Get urgent help</a>
+      </div>
+    </nav>
+  </header>
 
-<h1>Live CDC COVID-19 Snapshot (USA)</h1>
+  <main class="container">
+    <section class="hero" id="top">
+      <div class="card main">
+        <h1>Simple, trusted public health info for your community.</h1>
+        <p class="subtitle">
+          Use this hub to find prevention tips, vaccination guidance, and local care resources.
+          This page is for information only — it does not provide a medical diagnosis.
+        </p>
 
-<div class="card" id="data">
-  Loading live data…
-</div>
+        <div class="pillrow" aria-label="Quick topics">
+          <span class="pill">Respiratory illness prevention</span>
+          <span class="pill">Food safety</span>
+          <span class="pill">Mental well-being</span>
+          <span class="pill">Heat & cold safety</span>
+        </div>
 
-<script>
-  const url =
-    "https://data.cdc.gov/resource/9mfq-cb36.json?$order=date DESC&$limit=1";
+        <div class="kpi" aria-label="Key prevention reminders">
+          <div class="box">
+            <div class="num">Wash hands</div>
+            <div class="lbl">20 seconds with soap & water</div>
+          </div>
+          <div class="box">
+            <div class="num">Stay updated</div>
+            <div class="lbl">Vaccines and boosters as recommended</div>
+          </div>
+          <div class="box">
+            <div class="num">Test & isolate</div>
+            <div class="lbl">If you’re sick, reduce spread</div>
+          </div>
+        </div>
+      </div>
 
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      const d = data[0];
+      <aside class="card side" aria-label="Alerts and actions">
+        <div class="alert" id="emergency">
+          <strong>Emergency warning signs</strong>
+          <div class="small" style="margin-top:6px">
+            Call your local emergency number if someone has trouble breathing, chest pain,
+            confusion, blue lips/face, severe dehydration, or a rapidly worsening condition.
+          </div>
+        </div>
 
-      document.getElementById("data").innerHTML = `
-        <div class="metric"><span class="label">Date:</span> ${d.date}</div>
-        <div class="metric"><span class="label">New Cases:</span> ${Number(d.new_case).toLocaleString()}</div>
-        <div class="metric"><span class="label">Hospital Admissions:</span> ${Number(d.new_admission).toLocaleString()}</div>
-        <div class="metric"><span class="label">Deaths:</span> ${Number(d.new_death).toLocaleString()}</div>
-      `;
-    })
-    .catch(error => {
-      document.getElementById("data").innerHTML =
-        "Unable to load live data.";
-      console.error(error);
+        <div class="card" style="padding:14px;border-radius:14px;background:rgba(255,255,255,.02)">
+          <div style="font-weight:800;margin-bottom:6px">Today’s quick checklist</div>
+          <div class="small">✅ Get fresh air • ✅ Hydrate • ✅ Move a little • ✅ Check on someone</div>
+        </div>
+
+        <div class="card" style="padding:14px;border-radius:14px;background:rgba(255,255,255,.02)">
+          <div style="font-weight:800;margin-bottom:6px">Hotline (example)</div>
+          <div class="small">Community Health Line: <strong style="color:var(--text)">555-0100</strong><br/>
+            Hours: Mon–Fri 9am–5pm
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="grid" id="resources">
+      <div class="card section span6">
+        <h2>Recommended resources</h2>
+        <div class="list">
+          <div class="item">
+            <div>
+              <div style="font-weight:800">Vaccination guidance</div>
+              <p>Learn which vaccines are recommended by age and risk group.</p>
+            </div>
+            <a href="https://www.cdc.gov/vaccines/" target="_blank" rel="noopener">CDC vaccines</a>
+          </div>
+          <div class="item">
+            <div>
+              <div style="font-weight:800">Flu (influenza)</div>
+              <p>Symptoms, treatment, and prevention recommendations.</p>
+            </div>
+            <a href="https://www.cdc.gov/flu/" target="_blank" rel="noopener">CDC flu</a>
+          </div>
+          <div class="item">
+            <div>
+              <div style="font-weight:800">COVID-19</div>
+              <p>Testing, treatment, and updated public health guidance.</p>
+            </div>
+            <a href="https://www.cdc.gov/coronavirus/" target="_blank" rel="noopener">CDC COVID-19</a>
+          </div>
+          <div class="item">
+            <div>
+              <div style="font-weight:800">Mental health support</div>
+              <p>Coping tools and crisis resources.</p>
+            </div>
+            <a href="https://www.samhsa.gov/find-help/national-helpline" target="_blank" rel="noopener">SAMHSA</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card section span6">
+        <h2>Prevention basics</h2>
+        <div class="list">
+          <div class="item">
+            <div>
+              <div style="font-weight:800">Respiratory hygiene</div>
+              <p>Cover coughs/sneezes, consider masking in crowded indoor settings when ill.</p>
+            </div>
+          </div>
+          <div class="item">
+            <div>
+              <div style="font-weight:800">Food safety</div>
+              <p>Keep hot foods hot, cold foods cold; avoid cross-contamination.</p>
+            </div>
+          </div>
+          <div class="item">
+            <div>
+              <div style="font-weight:800">Heat & cold</div>
+              <p>Dress appropriately, hydrate, and check vulnerable neighbors.</p>
+            </div>
+          </div>
+          <div class="item">
+            <div>
+              <div style="font-weight:800">Medication safety</div>
+              <p>Follow labels; don’t share prescriptions; store out of children’s reach.</p>
+            </div>
+          </div>
+        </div>
+        <div class="small" style="margin-top:10px">
+          Tip: tailor guidance to your local health department’s recommendations.
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" id="symptoms">
+      <div class="card section span8">
+        <h2>Symptom guide (non-diagnostic)</h2>
+        <div class="small">
+          Select symptoms to see general guidance. This tool is informational and not a substitute for medical advice.
+        </div>
+
+        <form class="symptom-form" id="symptomForm">
+          <label><span>Fever (≥ 100.4°F / 38°C)</span><input type="checkbox" name="fever"></label>
+          <label><span>Shortness of breath</span><input type="checkbox" name="sob"></label>
+          <label><span>Chest pain/pressure</span><input type="checkbox" name="chest"></label>
+          <label><span>Severe dehydration (dizzy, very low urine)</span><input type="checkbox" name="dehydration"></label>
+          <label><span>Vomiting/diarrhea</span><input type="checkbox" name="gi"></label>
+          <label><span>Sore throat/cough</span><input type="checkbox" name="cough"></label>
+
+          <button type="button" id="checkBtn">Show guidance</button>
+        </form>
+
+        <div class="result" id="resultBox" role="status" aria-live="polite">
+          Select any symptoms and click <strong>Show guidance</strong>.
+        </div>
+      </div>
+
+      <div class="card section span4">
+        <h2>At-home care basics</h2>
+        <div class="small">
+          If symptoms are mild and you’re able to drink fluids:
+        </div>
+        <div style="margin-top:10px">
+          <span class="tag">Rest</span>
+          <span class="tag">Hydrate</span>
+          <span class="tag">Monitor</span>
+          <span class="tag">Stay home if sick</span>
+          <span class="tag">Test if recommended</span>
+        </div>
+
+        <div class="small" style="margin-top:12px">
+          If you have chronic conditions, are pregnant, or symptoms worsen, contact a clinician sooner.
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" id="clinic">
+      <div class="card section span12">
+        <h2>Find care near you (placeholder)</h2>
+        <div class="small">
+          Replace this with your local health department directory, clinic list, or embedded map.
+          For a simple demo, enter a ZIP code to generate a search link.
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+          <input id="zip" type="text" inputmode="numeric" pattern="[0-9]*"
+                 placeholder="Enter ZIP code (e.g., 37916)"
+                 style="flex:1 1 240px; padding:11px 12px; border-radius:14px; border:1px solid var(--border); background: rgba(255,255,255,.02); color:var(--text);" />
+          <button type="button" id="clinicBtn">Search clinics</button>
+          <a class="cta" id="clinicLink" href="#" target="_blank" rel="noopener" style="display:none">Open search</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" id="faq">
+      <div class="card section span12">
+        <h2>FAQ</h2>
+        <div style="display:grid; gap:10px; margin-top:10px">
+          <details>
+            <summary>When should I stay home from work or school?</summary>
+            <p>
+              If you have fever, vomiting/diarrhea, or you feel too unwell to participate normally, stay home and
+              follow local guidance. Return when symptoms improve and fever has resolved without fever-reducing meds.
+            </p>
+          </details>
+          <details>
+            <summary>What’s the best way to reduce respiratory spread?</summary>
+            <p>
+              Improve ventilation, wash hands, cover coughs, and consider masking if you’re symptomatic or in crowded indoor spaces.
+            </p>
+          </details>
+          <details>
+            <summary>How do I verify information?</summary>
+            <p>
+              Prefer official public health sources (local health department, CDC, WHO) and your clinician for personalized advice.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footergrid">
+        <div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Community Public Health Resource Hub</div>
+          <div>Educational demo page • Replace phone numbers and guidance with local health department info.</div>
+        </div>
+        <div class="small">
+          <div><strong style="color:var(--text)">Medical disclaimer:</strong> Not medical advice. In an emergency, call local emergency services.</div>
+          <div style="margin-top:6px">© <span id="year"></span> Demo</div>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // Footer year
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Symptom guidance (non-diagnostic, general)
+    const checkBtn = document.getElementById("checkBtn");
+    const resultBox = document.getElementById("resultBox");
+
+    checkBtn.addEventListener("click", () => {
+      const form = document.getElementById("symptomForm");
+      const data = new FormData(form);
+
+      const fever = data.get("fever") !== null;
+      const sob = data.get("sob") !== null;
+      const chest = data.get("chest") !== null;
+      const dehydration = data.get("dehydration") !== null;
+      const gi = data.get("gi") !== null;
+      const cough = data.get("cough") !== null;
+
+      // Simple rule-based guidance (example only)
+      if (sob || chest) {
+        resultBox.innerHTML =
+          "<strong>Urgent:</strong> Shortness of breath or chest pain can be serious. Seek urgent medical care or call emergency services, especially if symptoms are severe or worsening.";
+        return;
+      }
+
+      if (dehydration) {
+        resultBox.innerHTML =
+          "<strong>Urgent:</strong> Signs of severe dehydration warrant same-day medical advice. Try small, frequent sips of fluids and seek care if you can’t keep fluids down.";
+        return;
+      }
+
+      if (fever && (gi || cough)) {
+        resultBox.innerHTML =
+          "<strong>Monitor closely:</strong> You may have an acute infection. Rest, hydrate, and consider testing per local guidance. Contact a clinician if fever lasts >3 days, symptoms worsen, or you’re high-risk.";
+        return;
+      }
+
+      if (cough || fever || gi) {
+        resultBox.innerHTML =
+          "<strong>Self-care may be appropriate:</strong> Rest, hydrate, and stay home if you’re sick to reduce spread. Seek medical advice if symptoms worsen or you have risk factors.";
+        return;
+      }
+
+      resultBox.innerHTML =
+        "No symptoms selected. For prevention: wash hands, stay updated on vaccines, and follow local public health guidance.";
     });
-</script>
 
+    // Clinic search link generator
+    const clinicBtn = document.getElementById("clinicBtn");
+    const clinicLink = document.getElementById("clinicLink");
+    clinicBtn.addEventListener("click", () => {
+      const zip = document.getElementById("zip").value.trim();
+      const q = zip ? `urgent care near ${zip}` : "urgent care near me";
+      const url = "https://www.google.com/search?q=" + encodeURIComponent(q);
+      clinicLink.href = url;
+      clinicLink.style.display = "inline-flex";
+      clinicLink.textContent = zip ? `Open search for ${zip}` : "Open clinic search";
+    });
+  </script>
 </body>
 </html>
