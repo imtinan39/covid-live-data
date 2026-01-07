@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Public Health Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      padding: 30px;
+    }
+    h1 {
+      color: #0f766e;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .metric {
+      margin: 12px 0;
+      font-size: 18px;
+    }
+    .label {
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Live CDC COVID-19 Snapshot (USA)</h1>
+
+<div class="card" id="data">
+  Loading live data…
+</div>
+
+<script>
+  const url =
+    "https://data.cdc.gov/resource/9mfq-cb36.json?$order=date DESC&$limit=1";
+
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const d = data[0];
+
+      document.getElementById("data").innerHTML = `
+        <div class="metric"><span class="label">Date:</span> ${d.date}</div>
+        <div class="metric"><span class="label">New Cases:</span> ${Number(d.new_case).toLocaleString()}</div>
+        <div class="metric"><span class="label">Hospital Admissions:</span> ${Number(d.new_admission).toLocaleString()}</div>
+        <div class="metric"><span class="label">Deaths:</span> ${Number(d.new_death).toLocaleString()}</div>
+      `;
+    })
+    .catch(error => {
+      document.getElementById("data").innerHTML =
+        "Unable to load live data.";
+      console.error(error);
+    });
+</script>
+
+</body>
+</html>
